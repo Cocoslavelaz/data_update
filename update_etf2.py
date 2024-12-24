@@ -13,16 +13,21 @@ etf_list = pd.read_csv("etf_code.csv",header=None)
 code_list = etf_list[1].iloc[2:271]
 
 def update_etf_close(start=today, end=tomorrow):
-    code_list_tw = [code+ ".Tw" for code in code_list]
+    code_list_tw = [code + ".Tw" for code in code_list]
     print("Generated code_list_tw:", code_list_tw)  # 確認代碼列表
 
     df = pd.DataFrame()
     for index, code in enumerate(code_list_tw):
+        # 爬取股票數據
         stock_data = get_close(code, start=start, end=end).reset_index()
         print(f"Processing stock: {code}, columns: {stock_data.columns}")  # 確認爬取數據的列
 
-        stock_data.fillna(0, inplace=True)  # 填充缺失值
-        stock_data = stock_data.rename(columns={"Date": "date", "Adj Close": code_list.iloc[index] + "_close"})
+        # 將 MultiIndex 轉為單層索引
+        stock_data.columns = [col[0] if isinstance(col, tuple) else col for col in stock_data.columns]
+
+        # 填充缺失值
+        stock_data.fillna(0, inplace=True)
+        stock_data = stock_data.rename(columns={"Date": "date", "Close": code_list.iloc[index] + "_close"})
         print(f"Renamed columns: {stock_data.columns}")  # 確認重命名後的列名
 
         if df.empty:
