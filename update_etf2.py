@@ -12,7 +12,7 @@ tomorrow_str = tomorrow.strftime('%Y-%m-%d')
 etf_list = pd.read_csv("etf_code.csv",header=None)
 code_list = etf_list[1].iloc[2:271]
 
-def update_etf_close(start='2024-12-11', end='2024-12-24'):
+def update_etf_close(start=today, end=tomorrow):
     code_list_tw = [code+ ".Tw" for code in code_list]
     print("Generated code_list_tw:", code_list_tw)  # 確認代碼列表
 
@@ -36,3 +36,6 @@ def update_etf_close(start='2024-12-11', end='2024-12-24'):
     df.columns = [col + '_close' if col != 'date' else col for col in df.columns]
     insert_data("all_etf_close", df)
     return "update completed"
+
+if __name__ == "__main__":
+    print(update_etf_close())
